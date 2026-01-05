@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Generate Invoice{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-section {
+        background: #f8f9fa;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #007bff;
+    }
+    .training-field, .software-field {
+        display: none;
+    }
+    .amount-preview {
+        background: #e9ecef;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        {% if form.instance.pk %}Edit Invoice{% else %}Generate New Invoice{% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="invoice-form">
+                        {% csrf_token %}
+                        
+                        <!-- Client Information Section -->
+                        <div class="form-section">
+                            <h5><i class="fas fa-building"></i> Client Information</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.institute_name.id_for_label }}">Institute Name *</label>
+                                        {{ form.institute_name }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.institute_gst_number.id_for_label }}">GST Number</label>
+                                        {{ form.institute_gst_number }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ form.institute_address.id_for_label }}">Address *</label>
+                                {{ form.institute_address }}
+                            </div>
+                        </div>
+
+                        <!-- Service Information Section -->
+                        <div class="form-section">
+                            <h5><i class="fas fa-cogs"></i> Service Information</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.service_type.id_for_label }}">Service Type *</label>
+                                        {{ form.service_type }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.due_date.id_for_label }}">Due Date *</label>
+                                        {{ form.due_date }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ form.service_description.id_for_label }}">Service Description *</label>
+                                {{ form.service_description }}
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.service_from_date.id_for_label }}">Service From Date *</label>
+                                        {{ form.service_from_date }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.service_to_date.id_for_label }}">Service To Date *</label>
+                                        {{ form.service_to_date }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Training Service Fields -->
+                        <div class="form-section training-fields" id="training-section">
+                            <h5><i class="fas fa-chalkboard-teacher"></i> Training Details</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.training_hours.id_for_label }}">Training Batches *</label>
+                                        {{ form.training_hours }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.hourly_rate.id_for_label }}">Rate per Batch (₹) *</label>
+                                        {{ form.hourly_rate }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Software Service Fields -->
+                        <div class="form-section software-fields" id="software-section">
+                            <h5><i class="fas fa-code"></i> Software Details</h5>
+                            <div class="form-group">
+                                <label for="{{ form.software_amount.id_for_label }}">Software Amount (₹) *</label>
+                                {{ form.software_amount }}
+                            </div>
+                        </div>
+
+                        <!-- Financial Details Section -->
+                        <div class="form-section">
+                            <h5><i class="fas fa-calculator"></i> Financial Details</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.gst_percentage.id_for_label }}">GST Percentage (%)</label>
+                                        {{ form.gst_percentage }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.notes.id_for_label }}">Additional Notes</label>
+                                        {{ form.notes }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Amount Preview -->
+                        <div class="amount-preview" id="amount-preview" style="display: none;">
+                            <h5>Amount Calculation</h5>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <strong>Subtotal:</strong>
+                                    <div id="subtotal-amount">₹0.00</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <strong>GST Amount:</strong>
+                                    <div id="gst-amount">₹0.00</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <strong>Total Amount:</strong>
+                                    <div id="total-amount" style="font-size: 1.2em; color: #007bff;">₹0.00</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Errors -->
+                        {% if form.errors %}
+                        <div class="alert alert-danger mt-3">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Form Actions -->
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                {% if form.instance.pk %}Update Invoice{% else %}Generate Invoice{% endif %}
+                            </button>
+                            <a href="{% url 'invoices:list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const serviceTypeSelect = document.getElementById('service-type-select');
+    const trainingFields = document.querySelectorAll('.training-field');
+    const softwareFields = document.querySelectorAll('.software-field');
+    const trainingSection = document.getElementById('training-section');
+    const softwareSection = document.getElementById('software-section');
+    const amountPreview = document.getElementById('amount-preview');
+    
+    // Form fields for calculation
+    const trainingHoursField = document.getElementById('{{ form.training_hours.id_for_label }}');
+    const hourlyRateField = document.getElementById('{{ form.hourly_rate.id_for_label }}');
+    const softwareAmountField = document.getElementById('{{ form.software_amount.id_for_label }}');
+    const gstPercentageField = document.getElementById('{{ form.gst_percentage.id_for_label }}');
+    
+    function toggleServiceFields() {
+        const serviceType = serviceTypeSelect.value;
+        
+        if (serviceType === 'training') {
+            trainingSection.style.display = 'block';
+            softwareSection.style.display = 'none';
+            trainingFields.forEach(field => {
+                field.style.display = 'block';
+                field.required = true;
+            });
+            softwareFields.forEach(field => {
+                field.style.display = 'none';
+                field.required = false;
+                field.value = '';
+            });
+        } else if (serviceType === 'software') {
+            trainingSection.style.display = 'none';
+            softwareSection.style.display = 'block';
+            softwareFields.forEach(field => {
+                field.style.display = 'block';
+                field.required = true;
+            });
+            trainingFields.forEach(field => {
+                field.style.display = 'none';
+                field.required = false;
+                field.value = '';
+            });
+        } else {
+            trainingSection.style.display = 'none';
+            softwareSection.style.display = 'none';
+            trainingFields.forEach(field => {
+                field.style.display = 'none';
+                field.required = false;
+            });
+            softwareFields.forEach(field => {
+                field.style.display = 'none';
+                field.required = false;
+            });
+        }
+        
+        calculateAmount();
+    }
+    
+    function calculateAmount() {
+        const serviceType = serviceTypeSelect.value;
+        const gstPercentage = parseFloat(gstPercentageField.value) || 0;
+        let subtotal = 0;
+        
+        if (serviceType === 'training') {
+            const hours = parseFloat(trainingHoursField.value) || 0;
+            const rate = parseFloat(hourlyRateField.value) || 0;
+            subtotal = hours * rate;
+        } else if (serviceType === 'software') {
+            subtotal = parseFloat(softwareAmountField.value) || 0;
+        }
+        
+        const gstAmount = (subtotal * gstPercentage) / 100;
+        const totalAmount = subtotal + gstAmount;
+        
+        // Update preview
+        document.getElementById('subtotal-amount').textContent = '₹' + subtotal.toFixed(2);
+        document.getElementById('gst-amount').textContent = '₹' + gstAmount.toFixed(2);
+        document.getElementById('total-amount').textContent = '₹' + totalAmount.toFixed(2);
+        
+        // Show/hide preview
+        if (subtotal > 0) {
+            amountPreview.style.display = 'block';
+        } else {
+            amountPreview.style.display = 'none';
+        }
+    }
+    
+    // Event listeners
+    serviceTypeSelect.addEventListener('change', toggleServiceFields);
+    if (trainingHoursField) trainingHoursField.addEventListener('input', calculateAmount);
+    if (hourlyRateField) hourlyRateField.addEventListener('input', calculateAmount);
+    if (softwareAmountField) softwareAmountField.addEventListener('input', calculateAmount);
+    gstPercentageField.addEventListener('input', calculateAmount);
+    
+    // Initialize on page load
+    toggleServiceFields();
+});
+</script>
+{% endblock %}

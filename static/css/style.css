@@ -1,0 +1,140 @@
+/* Custom styles for ERP POC Manager */
+
+.card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 8px 8px 0 0 !important;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    border-top: none;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+}
+
+.btn {
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.form-control, .form-select {
+    border-radius: 6px;
+    border: 2px solid #e3e6f0;
+    padding: 0.75rem 1rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.alert {
+    border-radius: 6px;
+    border: none;
+}
+
+/* Dashboard specific styles */
+.dashboard-card {
+    transition: transform 0.2s;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Chart container */
+#taskChart {
+    height: 300px !important;
+}
+
+/* Progress indicators */
+.progress {
+    height: 8px;
+    border-radius: 4px;
+}
+
+/* Team selection styles */
+.candidate-card {
+    border: 2px solid #e3e6f0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.candidate-card.selected {
+    border-color: #28a745;
+    background-color: #f8fff9;
+}
+
+.score-badge {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+}
+
+/* Meeting styles */
+.meeting-upcoming {
+    border-left: 4px solid #ffc107;
+}
+
+.meeting-completed {
+    border-left: 4px solid #28a745;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar-nav {
+        text-align: center;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+}
+
+/* Animation utilities */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Status indicators */
+.status-todo { color: #dc3545; }
+.status-inprogress { color: #ffc107; }
+.status-done { color: #28a745; }
+
+/* Integration buttons */
+.integration-btn {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    transition: transform 0.2s ease;
+}
+
+.integration-btn:hover {
+    transform: scale(1.05);
+    color: white;
+}

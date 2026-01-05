@@ -1,0 +1,12 @@
+[
+  {
+    "model": "core.project",
+    "pk": 1,
+    "fields": {
+      "name": "Apache OFBiz ERP POC",
+      "start_date": "2024-01-15",
+      "end_date": "2024-02-15",
+      "scope": "Develop a proof of concept for Apache OFBiz ERP system integration. Focus on core modules including inventory management, order processing, and basic reporting capabilities."
+    }
+  }
+]

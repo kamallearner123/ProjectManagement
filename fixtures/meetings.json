@@ -1,0 +1,38 @@
+[
+  {
+    "model": "meetings.meeting",
+    "pk": 1,
+    "fields": {
+      "type": "standup",
+      "date_time": "2024-01-15T09:00:00Z",
+      "notes": "Daily standup - Week 1 Day 1. Discussed environment setup progress and initial task assignments. All team members present and ready to start development."
+    }
+  },
+  {
+    "model": "meetings.meeting",
+    "pk": 2,
+    "fields": {
+      "type": "standup",
+      "date_time": "2024-01-16T09:00:00Z",
+      "notes": "Daily standup - Week 1 Day 2. Good progress on authentication module. Testing framework setup on track. Discussed UI requirements for order processing."
+    }
+  },
+  {
+    "model": "meetings.meeting",
+    "pk": 3,
+    "fields": {
+      "type": "review",
+      "date_time": "2024-01-19T14:00:00Z",
+      "notes": "Weekly review - Week 1. Environment setup completed successfully. User authentication module 70% complete. Testing framework established. Planning for Week 2 inventory and order modules."
+    }
+  },
+  {
+    "model": "meetings.meeting",
+    "pk": 4,
+    "fields": {
+      "type": "standup",
+      "date_time": "2024-01-22T09:00:00Z",
+      "notes": "Daily standup - Week 2 Day 1. Starting inventory management and order processing modules. Reviewing dependencies and integration points."
+    }
+  }
+]

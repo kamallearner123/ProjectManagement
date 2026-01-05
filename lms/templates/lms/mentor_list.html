@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Mentors</h2>
+  <div>
+    <a href="{% url 'lms:student_create' %}" class="btn btn-outline-primary me-2">Add Student</a>
+    <a href="{% url 'lms:mentor_create' %}" class="btn btn-primary">Add Mentor</a>
+  </div>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Expertise</th>
+      <th>User</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for m in mentors %}
+    <tr>
+      <td>{{ m.full_name }}</td>
+      <td>{{ m.expertise }}</td>
+      <td>{{ m.user.username }}</td>
+      <td>
+        <a href="{% url 'lms:mentor_edit' m.id %}" class="btn btn-sm btn-secondary">Edit</a>
+        <a href="{% url 'lms:student_create' %}?mentor={{ m.id }}" class="btn btn-sm btn-success">Add Student</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4" class="text-center">No mentors yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

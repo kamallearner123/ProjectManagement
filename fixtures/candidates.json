@@ -1,0 +1,102 @@
+[
+  {
+    "model": "core.candidate",
+    "pk": 1,
+    "fields": {
+      "name": "Alex Johnson",
+      "java_score": 85,
+      "sql_score": 78,
+      "team_fit": 90
+    }
+  },
+  {
+    "model": "core.candidate",
+    "pk": 2,
+    "fields": {
+      "name": "Emma Williams",
+      "java_score": 92,
+      "sql_score": 88,
+      "team_fit": 85
+    }
+  },
+  {
+    "model": "core.candidate",
+    "pk": 3,
+    "fields": {
+      "name": "David Brown",
+      "java_score": 76,
+      "sql_score": 82,
+      "team_fit": 88
+    }
+  },
+  {
+    "model": "core.candidate",
+    "pk": 4,
+    "fields": {
+      "name": "Sophie Davis",
+      "java_score": 89,
+      "sql_score": 85,
+      "team_fit": 92
+    }
+  },
+  {
+    "model": "core.candidate",
+    "pk": 5,
+    "fields": {
+      "name": "Ryan Miller",
+      "java_score": 82,
+      "sql_score": 79,
+      "team_fit": 86
+    }
+  },
+  {
+    "model": "core.candidate",
+    "pk": 6,
+    "fields": {
+      "name": "Jessica Wilson",
+      "java_score": 78,
+      "sql_score": 90,
+      "team_fit": 84
+    }
+  },
+  {
+    "model": "core.candidate",
+    "pk": 7,
+    "fields": {
+      "name": "Tom Anderson",
+      "java_score": 87,
+      "sql_score": 83,
+      "team_fit": 89
+    }
+  },
+  {
+    "model": "core.candidate",
+    "pk": 8,
+    "fields": {
+      "name": "Olivia Taylor",
+      "java_score": 91,
+      "sql_score": 86,
+      "team_fit": 88
+    }
+  },
+  {
+    "model": "core.candidate",
+    "pk": 9,
+    "fields": {
+      "name": "Mark Thomas",
+      "java_score": 84,
+      "sql_score": 81,
+      "team_fit": 87
+    }
+  },
+  {
+    "model": "core.candidate",
+    "pk": 10,
+    "fields": {
+      "name": "Rachel Lee",
+      "java_score": 88,
+      "sql_score": 84,
+      "team_fit": 91
+    }
+  }
+]

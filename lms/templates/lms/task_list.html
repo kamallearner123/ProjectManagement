@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>LMS Tasks</h2>
+  <a href="{% url 'lms:task_create' %}" class="btn btn-primary">Add Task</a>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Mentor</th>
+      <th>Students</th>
+      <th>Scheduled</th>
+      <th>Due</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in tasks %}
+    <tr>
+      <td>{{ t.title }}</td>
+      <td>{{ t.mentor.full_name }}</td>
+      <td>
+        {% for s in t.students.all %}
+          <span class="badge text-bg-secondary">{{ s.full_name }}</span>
+        {% empty %}
+          -
+        {% endfor %}
+      </td>
+      <td>{{ t.scheduled_date }}</td>
+      <td>{{ t.due_date }}</td>
+      <td>{{ t.get_status_display }}</td>
+      <td><a href="{% url 'lms:task_edit' t.id %}" class="btn btn-sm btn-secondary">Edit</a></td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7" class="text-center">No tasks yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

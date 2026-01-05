@@ -1,0 +1,114 @@
+[
+  {
+    "model": "tasks.task",
+    "pk": 1,
+    "fields": {
+      "title": "Environment Setup",
+      "description": "Set up development environment with Apache OFBiz, configure databases, and prepare project structure",
+      "assigned_to": 2,
+      "project": 1,
+      "week": 1,
+      "status": "done",
+      "duration": 2,
+      "metrics": {"hours_spent": 16, "commits": 5}
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": 2,
+    "fields": {
+      "title": "User Management Module",
+      "description": "Implement user authentication and authorization features in OFBiz",
+      "assigned_to": 2,
+      "project": 1,
+      "week": 1,
+      "status": "inprogress",
+      "duration": 3,
+      "metrics": {"hours_spent": 12, "commits": 3}
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": 3,
+    "fields": {
+      "title": "Inventory Management",
+      "description": "Develop inventory tracking and management functionality",
+      "assigned_to": 4,
+      "project": 1,
+      "week": 2,
+      "status": "todo",
+      "duration": 5,
+      "metrics": {}
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": 4,
+    "fields": {
+      "title": "Order Processing System",
+      "description": "Create order processing workflow and management interface",
+      "assigned_to": 5,
+      "project": 1,
+      "week": 2,
+      "status": "todo",
+      "duration": 4,
+      "metrics": {}
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": 5,
+    "fields": {
+      "title": "Testing Framework Setup",
+      "description": "Set up automated testing framework and write initial test cases",
+      "assigned_to": 3,
+      "project": 1,
+      "week": 1,
+      "status": "inprogress",
+      "duration": 3,
+      "metrics": {"hours_spent": 8, "commits": 2}
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": 6,
+    "fields": {
+      "title": "Basic Reporting",
+      "description": "Implement basic reporting functionality for inventory and orders",
+      "assigned_to": 4,
+      "project": 1,
+      "week": 3,
+      "status": "todo",
+      "duration": 3,
+      "metrics": {}
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": 7,
+    "fields": {
+      "title": "UI/UX Design",
+      "description": "Design and implement user interface improvements",
+      "assigned_to": 5,
+      "project": 1,
+      "week": 3,
+      "status": "todo",
+      "duration": 4,
+      "metrics": {}
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": 8,
+    "fields": {
+      "title": "Integration Testing",
+      "description": "Comprehensive testing of all integrated modules",
+      "assigned_to": 3,
+      "project": 1,
+      "week": 4,
+      "status": "todo",
+      "duration": 5,
+      "metrics": {}
+    }
+  }
+]

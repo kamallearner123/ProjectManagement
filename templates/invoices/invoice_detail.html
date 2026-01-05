@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Invoice {{ invoice.invoice_number }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .invoice-header {
+        border-bottom: 3px solid #007bff;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+    }
+    .invoice-logo {
+        max-height: 140px;
+        max-width: 320px;
+    }
+    .invoice-details table {
+        font-size: 0.9em;
+    }
+    .invoice-amount {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+    .total-amount {
+        font-size: 1.3em;
+        font-weight: bold;
+        color: #007bff;
+    }
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+        .invoice-container {
+            margin: 0;
+            padding: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 invoice-container">
+    <!-- Action Buttons -->
+    <div class="row no-print mb-3">
+        <div class="col-12">
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'invoices:list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+                <div>
+                    <a href="{% url 'invoices:edit' invoice.pk %}" class="btn btn-outline-primary">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a href="{% url 'invoices:pdf' invoice.pk %}" class="btn btn-danger" target="_blank">
+                        <i class="fas fa-file-pdf"></i> Download PDF
+                    </a>
+                    <button onclick="window.print()" class="btn btn-info">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Content -->
+    <div class="card">
+        <div class="card-body">
+            <!-- Invoice Header -->
+            <div class="invoice-header">
+                <div class="row">
+                    <div class="col-md-6">
+                        <img src="{% static 'images/APT_02.jpg' %}" alt="Company Logo" class="invoice-logo">
+                    </div>
+                    <div class="col-md-6 text-right">
+                        <h2 class="text-primary">TAX INVOICE</h2>
+                        <h4>{{ invoice.invoice_number }}</h4>
+                        <p class="mb-0">Date: {{ invoice.invoice_date|date:"M d, Y" }}</p>
+                        <p class="mb-0">Due Date: {{ invoice.due_date|date:"M d, Y" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Company and Client Details -->
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>From:</h5>
+                    <div class="mb-3">
+                        <strong>APT COMPUTING LABS</strong><br>
+                        12066, Tower 12, Prestige Royale Gardens, Yelahanka<br>
+                        Bangalore, Karnataka - 560064<br>
+                        India<br>
+                        GST: 29BCGPK2447E1ZN<br>
+                        Email: info@aptcomputinglabs.com<br>
+                        Phone: +91 9739858111
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h5>Bill To:</h5>
+                    <div class="mb-3">
+                        <strong>{{ invoice.institute_name }}</strong><br>
+                        {{ invoice.institute_address|linebreaks }}
+                        {% if invoice.institute_gst_number %}
+                        GST: {{ invoice.institute_gst_number }}<br>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service Details -->
+            <div class="invoice-details">
+                <h5>Service Details:</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Description</th>
+                                <th>Service Type</th>
+                                <th>Service Period</th>
+                                {% if invoice.service_type == 'training' %}
+                                    <th>Batches</th>
+                                    <th>Rate/Batch</th>
+                                {% endif %}
+                                <th class="text-right">Amount (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ invoice.service_description }}</td>
+                                <td>
+                                    <span class="badge badge-{% if invoice.service_type == 'training' %}info{% else %}secondary{% endif %}">
+                                        {{ invoice.get_service_type_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small>
+                                        <strong>From:</strong> {{ invoice.service_from_date|date:"M d, Y" }}<br>
+                                        <strong>To:</strong> {{ invoice.service_to_date|date:"M d, Y" }}
+                                    </small>
+                                </td>
+                                {% if invoice.service_type == 'training' %}
+                                    <td>{{ invoice.training_hours }}</td>
+                                    <td>₹{{ invoice.hourly_rate|floatformat:2 }}</td>
+                                {% endif %}
+                                <td class="text-right">₹{{ invoice.subtotal|floatformat:2 }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% if invoice.service_type == 'training' %}
+                <div class="mt-2">
+                    <em>({{ invoice.training_hours }} batches @ INR {{ invoice.hourly_rate|floatformat:2 }}/batch)</em>
+                </div>
+                {% elif invoice.service_type == 'software' %}
+                <div class="mt-2">
+                    <em>(Software release @ INR {{ invoice.software_amount|floatformat:2 }})</em>
+                </div>
+                {% endif %}
+            </div>
+            </div>
+
+            <!-- Amount Calculation -->
+            <div class="row">
+                <div class="col-md-6 offset-md-6">
+                    <div class="invoice-amount">
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Subtotal:</strong></td>
+                                <td class="text-right">₹{{ invoice.subtotal|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>GST ({{ invoice.gst_percentage }}%):</strong></td>
+                                <td class="text-right">₹{{ invoice.gst_amount|floatformat:2 }}</td>
+                            </tr>
+                            <tr class="border-top">
+                                <td class="total-amount">Total Amount:</td>
+                                <td class="text-right total-amount">₹{{ invoice.total_amount|floatformat:2 }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Status -->
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    {% if invoice.notes %}
+                    <h6>Notes:</h6>
+                    <p>{{ invoice.notes|linebreaks }}</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 text-right">
+                    <h6>Payment Status:</h6>
+                    {% if invoice.is_paid %}
+                        <span class="badge badge-success badge-lg">
+                            <i class="fas fa-check-circle"></i> Paid
+                        </span>
+                        {% if invoice.payment_date %}
+                        <br><small class="text-muted">Paid on: {{ invoice.payment_date|date:"M d, Y" }}</small>
+                        {% endif %}
+                    {% else %}
+                        <span class="badge badge-warning badge-lg">
+                            <i class="fas fa-clock"></i> Pending
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <hr>
+                    <div class="text-center text-muted">
+                        <small>
+                            Thank you for your business!<br>
+                            For any queries, please contact us at info@aptcomputinglabs.com
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Update Form (Only for unpaid invoices) -->
+            {% if not invoice.is_paid %}
+            <div class="row mt-4 no-print">
+                <div class="col-md-6 offset-md-3">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6>Mark as Paid</h6>
+                            <form method="post" action="{% url 'invoices:mark_paid' invoice.pk %}">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label>Payment Date:</label>
+                                    <input type="date" name="payment_date" class="form-control" 
+                                           value="{% now 'Y-m-d' %}" required>
+                                </div>
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    <i class="fas fa-check"></i> Mark as Paid
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

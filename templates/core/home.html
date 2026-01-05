@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - ERP POC Manager{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1>Project Dashboard</h1>
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Tasks</h5>
+                        <h2>{{ total_tasks }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Completed</h5>
+                        <h2>{{ completed_tasks }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">In Progress</h5>
+                        <h2>{{ inprogress_tasks }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-danger text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">To Do</h5>
+                        <h2>{{ todo_tasks }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Task Progress Chart</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="taskChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Recent Activities</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            {% for log in recent_logs %}
+                                <li class="mb-2">
+                                    <strong>{{ log.user.username }}</strong><br>
+                                    <small class="text-muted">{{ log.date }}</small><br>
+                                    {{ log.today|truncatewords:10 }}
+                                </li>
+                            {% empty %}
+                                <li>No recent activities</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5>Projects</h5>
+                        <a href="{% url 'admin:core_project_add' %}" class="btn btn-primary btn-sm">Add Project</a>
+                    </div>
+                    <div class="card-body">
+                        {% if projects %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Start Date</th>
+                                            <th>End Date</th>
+                                            <th>Scope</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for project in projects %}
+                                        <tr>
+                                            <td>{{ project.name }}</td>
+                                            <td>{{ project.start_date }}</td>
+                                            <td>{{ project.end_date }}</td>
+                                            <td>{{ project.scope|truncatewords:10 }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p>No projects yet. <a href="{% url 'admin:core_project_add' %}">Create one</a></p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integration Links -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>External Tools Integration</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <a href="https://gitlab.com" target="_blank" class="btn btn-outline-primary w-100 mb-2">
+                                    GitLab Repository
+                                </a>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="https://openproject.org" target="_blank" class="btn btn-outline-secondary w-100 mb-2">
+                                    OpenProject
+                                </a>
+                            </div>
+                            <div class="col-md-4">
+                                <button onclick="runMonitoringScript()" class="btn btn-outline-success w-100 mb-2">
+                                    Run Git Analysis
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const ctx = document.getElementById('taskChart').getContext('2d');
+const taskChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: ['To Do', 'In Progress', 'Done'],
+        datasets: [{
+            data: [{{ todo_tasks }}, {{ inprogress_tasks }}, {{ completed_tasks }}],
+            backgroundColor: ['#dc3545', '#ffc107', '#28a745']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+
+function runMonitoringScript() {
+    // This would call a Django view that runs the Python monitoring script
+    fetch('/run-monitoring/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert('Monitoring script completed. Check logs for details.');
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error running monitoring script.');
+    });
+}
+</script>
+{% endblock %}

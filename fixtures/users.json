@@ -1,0 +1,77 @@
+[
+  {
+    "model": "accounts.user",
+    "pk": 1,
+    "fields": {
+      "username": "admin",
+      "email": "admin@erpmanager.com",
+      "role": "lead",
+      "first_name": "Project",
+      "last_name": "Lead",
+      "is_staff": true,
+      "is_superuser": true,
+      "is_active": true,
+      "date_joined": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 2,
+    "fields": {
+      "username": "john_dev",
+      "email": "john@erpmanager.com",
+      "role": "member",
+      "first_name": "John",
+      "last_name": "Developer",
+      "is_staff": false,
+      "is_superuser": false,
+      "is_active": true,
+      "date_joined": "2024-01-02T00:00:00Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 3,
+    "fields": {
+      "username": "sarah_qa",
+      "email": "sarah@erpmanager.com",
+      "role": "member",
+      "first_name": "Sarah",
+      "last_name": "QA",
+      "is_staff": false,
+      "is_superuser": false,
+      "is_active": true,
+      "date_joined": "2024-01-03T00:00:00Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 4,
+    "fields": {
+      "username": "mike_backend",
+      "email": "mike@erpmanager.com",
+      "role": "member",
+      "first_name": "Mike",
+      "last_name": "Backend",
+      "is_staff": false,
+      "is_superuser": false,
+      "is_active": true,
+      "date_joined": "2024-01-04T00:00:00Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 5,
+    "fields": {
+      "username": "lisa_frontend",
+      "email": "lisa@erpmanager.com",
+      "role": "member",
+      "first_name": "Lisa",
+      "last_name": "Frontend",
+      "is_staff": false,
+      "is_superuser": false,
+      "is_active": true,
+      "date_joined": "2024-01-05T00:00:00Z"
+    }
+  }
+]

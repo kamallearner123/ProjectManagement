@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Daily Log - ERP POC Manager{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4>Daily Log Entry</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ form.yesterday.id_for_label }}" class="form-label">What I accomplished yesterday</label>
+                        {{ form.yesterday }}
+                        {% if form.yesterday.errors %}
+                            <div class="text-danger">{{ form.yesterday.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.today.id_for_label }}" class="form-label">What I plan to do today</label>
+                        {{ form.today }}
+                        {% if form.today.errors %}
+                            <div class="text-danger">{{ form.today.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.blockers.id_for_label }}" class="form-label">Blockers/Issues (optional)</label>
+                        {{ form.blockers }}
+                        {% if form.blockers.errors %}
+                            <div class="text-danger">{{ form.blockers.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.comments.id_for_label }}" class="form-label">Additional Comments (optional)</label>
+                        {{ form.comments }}
+                        {% if form.comments.errors %}
+                            <div class="text-danger">{{ form.comments.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Log</button>
+                    <a href="{% url 'log_list' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
