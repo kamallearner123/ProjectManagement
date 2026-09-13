@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Finance Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-wallet text-primary me-2"></i> Finance Dashboard</h1>
+    <div>
+        <a href="{% url 'invoices:create' %}" class="btn btn-primary me-2">Generate Client Invoice</a>
+        <a href="{% url 'invoices:expense_upload' %}" class="btn btn-outline-primary">Upload Vendor Invoice</a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Stat Cards -->
+    <div class="col-md-4 mb-4">
+        <div class="card bg-success text-white shadow h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1">Total Revenue (Paid)</h6>
+                        <h2 class="mb-0">₹{{ total_revenue|floatformat:2 }}</h2>
+                    </div>
+                    <i class="fas fa-rupee-sign fa-2x opacity-50"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="{% url 'invoices:list' %}?is_paid=True">View Details</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card bg-warning text-white shadow h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1">Outstanding (Unpaid)</h6>
+                        <h2 class="mb-0">₹{{ outstanding|floatformat:2 }}</h2>
+                    </div>
+                    <i class="fas fa-clock fa-2x opacity-50"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="{% url 'invoices:list' %}?is_paid=False">View Details</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card bg-danger text-white shadow h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1">Total Expenses</h6>
+                        <h2 class="mb-0">₹{{ total_expenses|floatformat:2 }}</h2>
+                    </div>
+                    <i class="fas fa-shopping-cart fa-2x opacity-50"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="{% url 'invoices:expense_list' %}">View Details</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Invoices -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Recent Client Invoices</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for invoice in recent_invoices %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <div>
+                            <strong>{{ invoice.invoice_number }}</strong> - {{ invoice.institute_name }}
+                        </div>
+                        <span class="badge bg-{{ invoice.is_paid|yesno:'success,warning' }} rounded-pill">
+                            ₹{{ invoice.total_amount|floatformat:2 }}
+                        </span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-muted px-0">No client invoices found.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Expenses -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Recent Vendor Invoices</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for expense in recent_expenses %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <div>
+                            <strong>{{ expense.vendor_name }}</strong>
+                            <div class="small text-muted">{{ expense.date }}</div>
+                        </div>
+                        <span class="badge bg-danger rounded-pill">₹{{ expense.amount|floatformat:2 }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-muted px-0">No vendor invoices found.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

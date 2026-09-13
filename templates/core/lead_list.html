@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Lead Tracking - ERP POC Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Sales Pipeline & Leads</h1>
+    <a href="{% url 'create_lead' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Add Lead</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if leads %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Contact Info</th>
+                            <th>Status</th>
+                            <th>Notes</th>
+                            <th>Added On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lead in leads %}
+                        <tr>
+                            <td><strong>{{ lead.name }}</strong></td>
+                            <td>
+                                <div><a href="mailto:{{ lead.email }}">{{ lead.email }}</a></div>
+                                {% if lead.phone %}<div><small><i class="fas fa-phone"></i> {{ lead.phone }}</small></div>{% endif %}
+                            </td>
+                            <td>
+                                <span class="badge 
+                                    {% if lead.status == 'won' %}bg-success
+                                    {% elif lead.status == 'lost' %}bg-danger
+                                    {% elif lead.status == 'negotiation' %}bg-warning text-dark
+                                    {% elif lead.status == 'contacted' %}bg-info text-dark
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ lead.get_status_display }}
+                                </span>
+                            </td>
+                            <td><small>{{ lead.notes|truncatewords:10|default:"-" }}</small></td>
+                            <td>{{ lead.created_at|date:"M d, Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-center text-muted my-4">No leads in the pipeline. <a href="{% url 'create_lead' %}">Add a lead</a>.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

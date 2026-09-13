@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ task.title }} - Task Details{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">{{ task.title }}</h4>
+                <span class="badge bg-light text-dark">{{ task.get_status_display }}</span>
+            </div>
+            <div class="card-body">
+                <p><strong>Project:</strong> {{ task.project.name }}</p>
+                {% if task.milestone %}
+                    <p><strong>Milestone:</strong> {{ task.milestone.title }}</p>
+                {% endif %}
+                <p><strong>Priority:</strong> <span class="badge bg-{{ task.priority }}">{{ task.get_priority_display }}</span></p>
+                <p><strong>Assigned To:</strong> {{ task.assigned_to.username|default:"Unassigned" }}</p>
+                <p><strong>Deadline:</strong> {{ task.deadline|default:"No deadline" }}</p>
+                <hr>
+                <h5>Description</h5>
+                <p>{{ task.description|linebreaks }}</p>
+            </div>
+        </div>
+
+        <!-- Attachments Section -->
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Attachments</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group mb-3">
+                    {% for attachment in task.attachments.all %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <a href="{{ attachment.file.url }}" target="_blank">{{ attachment.file.name }}</a>
+                            <small class="text-muted">by {{ attachment.uploaded_by.username }}</small>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-muted">No attachments yet.</li>
+                    {% endfor %}
+                </ul>
+
+                <form method="post" enctype="multipart/form-data" class="mt-3">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="file" name="file" class="form-control" required>
+                        <button type="submit" name="add_attachment" class="btn btn-outline-primary">Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Time Tracking Section -->
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Time Tracking</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group mb-3">
+                    {% for log in task.time_logs.all %}
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ log.hours }}h</strong>
+                                <span class="badge {% if log.is_billable %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {% if log.is_billable %}Billable{% else %}Non-billable{% endif %}
+                                </span>
+                            </div>
+                            <small class="text-muted">{{ log.user.username }} on {{ log.date }}</small>
+                            {% if log.note %}<p class="small mb-0 mt-1">{{ log.note }}</p>{% endif %}
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-muted">No time logged yet.</li>
+                    {% endfor %}
+                </ul>
+
+                <form method="post" class="mt-3">
+                    {% csrf_token %}
+                    <h6 class="border-bottom pb-2">Log Time</h6>
+                    <div class="mb-2">
+                        <label class="form-label small">Hours</label>
+                        <input type="number" name="hours" step="0.01" min="0.1" class="form-control form-control-sm" required>
+                    </div>
+                    <div class="mb-2 form-check">
+                        <input type="checkbox" name="is_billable" class="form-check-input" id="is_billable" checked>
+                        <label class="form-check-label small" for="is_billable">Billable</label>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small">Notes</label>
+                        <input type="text" name="note" class="form-control form-control-sm">
+                    </div>
+                    <button type="submit" name="add_time" class="btn btn-sm btn-primary w-100">Log Time</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -9,7 +9,7 @@ class InvoiceForm(forms.ModelForm):
         fields = [
             'due_date', 'institute_name', 'institute_address', 'institute_gst_number',
             'service_type', 'service_description', 'service_from_date', 'service_to_date',
-            'training_hours', 'hourly_rate', 'software_amount', 'gst_percentage', 'notes'
+            'training_hours', 'hourly_rate', 'software_amount', 'gst_percentage', 'notes', 'pdf_file'
         ]
         widgets = {
             'due_date': forms.DateInput(attrs={
@@ -76,6 +76,10 @@ class InvoiceForm(forms.ModelForm):
                 'rows': 2,
                 'placeholder': 'Additional notes (optional)'
             }),
+            'pdf_file': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': '.pdf'
+            }),
         }
     
     def __init__(self, *args, **kwargs):
@@ -139,4 +143,25 @@ class InvoiceSearchForm(forms.Form):
         choices=[('', 'All'), ('True', 'Paid'), ('False', 'Unpaid')],
         required=False,
         widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
+from .models import Expense
+
+class ExpenseForm(forms.ModelForm):
+    class Meta:
+        model = Expense
+        fields = ['vendor_name', 'date', 'amount', 'category', 'description', 'pdf_file']
+        widgets = {
+            'vendor_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'category': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'pdf_file': forms.FileInput(attrs={'class': 'form-control'}),
+        }
+
+class ExpenseUploadForm(forms.Form):
+    pdf_file = forms.FileField(
+        widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf'}),
+        label='Upload Invoice PDF'
     )

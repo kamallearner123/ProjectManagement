@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Project Management Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-project-diagram text-primary me-2"></i> PM Dashboard</h1>
+    <a href="{% url 'create_project' %}" class="btn btn-primary">New Project</a>
+</div>
+
+<div class="row">
+    <!-- Stat Cards -->
+    <div class="col-md-4 mb-4">
+        <div class="card bg-primary text-white shadow h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1">Total Projects</h6>
+                        <h2 class="mb-0">{{ projects.count }}</h2>
+                    </div>
+                    <i class="fas fa-folder fa-2x opacity-50"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="{% url 'home' %}">View Details</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card bg-warning text-white shadow h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1">Open Tasks</h6>
+                        <h2 class="mb-0">{{ open_tasks }}</h2>
+                    </div>
+                    <i class="fas fa-tasks fa-2x opacity-50"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="{% url 'task_list' %}">View Details</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card bg-info text-white shadow h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1">Upcoming Meetings</h6>
+                        <h2 class="mb-0">{{ upcoming_meetings.count }}</h2>
+                    </div>
+                    <i class="fas fa-calendar-alt fa-2x opacity-50"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="{% url 'meeting_list' %}">View Details</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Active Projects -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">All Projects</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for project in projects %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        {{ project.name }}
+                        <span class="badge bg-secondary rounded-pill">{{ project.tasks.count }} Tasks</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-muted px-0">No projects found.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Logs -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Recent Daily Logs</h6>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    {% for log in recent_logs %}
+                    <div class="mb-3 border-bottom pb-2">
+                        <strong>{{ log.user.username }}</strong> 
+                        <span class="text-muted small">({{ log.date }})</span>
+                        <p class="mb-0 small mt-1">{{ log.description|truncatewords:15 }}</p>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center">No logs submitted yet.</p>
+                    {% endfor %}
+                </div>
+                <a href="{% url 'log_list' %}" class="btn btn-sm btn-outline-primary w-100 mt-2">View All Logs</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

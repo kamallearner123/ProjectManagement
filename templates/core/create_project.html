@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Project - ERP POC Manager{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Create New Project</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Create Project</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

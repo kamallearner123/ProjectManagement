@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Uploaded Expenses / Vendor Invoices - ERP POC Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Uploaded Vendor Invoices</h1>
+    <a href="{% url 'invoices:expense_upload' %}" class="btn btn-primary">
+        <i class="fas fa-upload"></i> Upload PDF Invoice
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        {% if expenses %}
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Vendor / Details</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Original PDF</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for expense in expenses %}
+                        <tr>
+                            <td>{{ expense.date|date:"M d, Y" }}</td>
+                            <td>
+                                <strong>{{ expense.vendor_name }}</strong><br>
+                                <small class="text-muted">{{ expense.description|truncatewords:8 }}</small>
+                            </td>
+                            <td><span class="badge bg-secondary">{{ expense.get_category_display|default:"Other" }}</span></td>
+                            <td class="fw-bold">₹{{ expense.amount|floatformat:2 }}</td>
+                            <td>
+                                {% if expense.pdf_file %}
+                                    <a href="{{ expense.pdf_file.url }}" class="btn btn-sm btn-outline-info" download>
+                                        <i class="fas fa-download"></i> Download PDF
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">No File</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'invoices:expense_edit' expense.pk %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <a href="{% url 'invoices:expense_delete' expense.pk %}" class="btn btn-sm btn-outline-dark" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <p class="text-muted mb-3">No expenses or vendor invoices have been uploaded yet.</p>
+                <a href="{% url 'invoices:expense_upload' %}" class="btn btn-outline-primary">Upload your first invoice</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

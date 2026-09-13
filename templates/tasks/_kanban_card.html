@@ -1,0 +1,21 @@
+<div id="task-{{ task.id }}" class="kanban-task priority-{{ task.priority }}" draggable="true" ondragstart="drag(event)" data-task-id="{{ task.id }}">
+    <div class="d-flex justify-content-between mb-2">
+        <strong><a href="{% url 'task_detail' task.id %}">{{ task.title }}</a></strong>
+    </div>
+    <div class="small text-muted mb-2">
+        {{ task.project.name }}
+    </div>
+    <div class="d-flex justify-content-between align-items-center">
+        {% if task.assigned_to %}
+            <span class="badge bg-light text-dark" title="Assigned to"><i class="fas fa-user"></i> {{ task.assigned_to.username }}</span>
+        {% else %}
+            <span class="badge bg-light text-muted">Unassigned</span>
+        {% endif %}
+        
+        {% if task.deadline %}
+            <span class="badge {% if task.deadline < today %}bg-danger{% else %}bg-secondary{% endif %}" title="Deadline">
+                <i class="far fa-calendar-alt"></i> {{ task.deadline|date:"M d" }}
+            </span>
+        {% endif %}
+    </div>
+</div>

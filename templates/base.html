@@ -20,26 +20,59 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'home' %}">Dashboard</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'task_list' %}">Tasks</a>
+                    
+                    <!-- CRM Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="crmDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            CRM
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="crmDropdown">
+                            <li><a class="dropdown-item fw-bold" href="{% url 'crm_dashboard' %}"><i class="fas fa-chart-line me-2"></i>CRM Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'client_list' %}">Clients</a></li>
+                            <li><a class="dropdown-item" href="{% url 'lead_list' %}">Leads</a></li>
+                        </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'log_list' %}">Daily Logs</a>
+
+                    <!-- Project Management Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="pmDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Project Management
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="pmDropdown">
+                            <li><a class="dropdown-item fw-bold" href="{% url 'pm_dashboard' %}"><i class="fas fa-project-diagram me-2"></i>PM Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'task_list' %}">Tasks (Kanban)</a></li>
+                            <li><a class="dropdown-item" href="{% url 'log_list' %}">Daily Logs</a></li>
+                            <li><a class="dropdown-item" href="{% url 'meeting_list' %}">Meetings</a></li>
+                        </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'meeting_list' %}">Meetings</a>
+
+                    <!-- Finance Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="financeDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Finance
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="financeDropdown">
+                            <li><a class="dropdown-item fw-bold" href="{% url 'invoices:finance_dashboard' %}"><i class="fas fa-wallet me-2"></i>Finance Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'invoices:list' %}">Client Invoices</a></li>
+                            <li><a class="dropdown-item" href="{% url 'invoices:expense_list' %}">Vendor Invoices (Expenses)</a></li>
+                        </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'invoices:list' %}">Invoices</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'lms:mentor_list' %}">LMS</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'lms:student_list' %}">Students</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'lms:task_list' %}">LMS Tasks</a>
+
+                    <!-- LMS Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="lmsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            LMS
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="lmsDropdown">
+                            <li><a class="dropdown-item fw-bold" href="{% url 'lms:lms_dashboard' %}"><i class="fas fa-graduation-cap me-2"></i>LMS Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'lms:mentor_list' %}">Mentors</a></li>
+                            <li><a class="dropdown-item" href="{% url 'lms:student_list' %}">Students</a></li>
+                            <li><a class="dropdown-item" href="{% url 'lms:task_list' %}">LMS Tasks</a></li>
+                        </ul>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
@@ -51,7 +84,10 @@
                             <a class="nav-link" href="/admin/">Admin</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-link nav-link" style="text-decoration:none; outline:none; box-shadow:none;">Logout</button>
+                            </form>
                         </li>
                     {% else %}
                         <li class="nav-item">

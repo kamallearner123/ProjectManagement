@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from accounts.decorators import is_finance
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum, Count
@@ -8,8 +9,9 @@ from django.template.loader import get_template
 from django.utils import timezone
 from datetime import datetime
 import io
-from .models import Invoice
-from .forms import InvoiceForm, InvoiceSearchForm
+import PyPDF2
+from .models import Invoice, Expense
+from .forms import InvoiceForm, InvoiceSearchForm, ExpenseForm, ExpenseUploadForm
 
 try:
     from reportlab.pdfgen import canvas
@@ -23,6 +25,23 @@ except ImportError:
     REPORTLAB_AVAILABLE = False
 
 @login_required
+@is_finance
+def finance_dashboard(request):
+    total_revenue = Invoice.objects.filter(is_paid=True).aggregate(total=Sum('total_amount'))['total'] or 0
+    outstanding = Invoice.objects.filter(is_paid=False).aggregate(total=Sum('total_amount'))['total'] or 0
+    total_expenses = Expense.objects.aggregate(total=Sum('amount'))['total'] or 0
+    
+    context = {
+        'total_revenue': total_revenue,
+        'outstanding': outstanding,
+        'total_expenses': total_expenses,
+        'recent_invoices': Invoice.objects.order_by('-created_at')[:5],
+        'recent_expenses': Expense.objects.order_by('-date')[:5],
+    }
+    return render(request, 'invoices/finance_dashboard.html', context)
+
+@login_required
+@is_finance
 def invoice_list(request):
     """Display list of invoices with search and filter functionality"""
     search_form = InvoiceSearchForm(request.GET)
@@ -73,10 +92,11 @@ def invoice_list(request):
     return render(request, 'invoices/invoice_list.html', context)
 
 @login_required
+@is_finance
 def invoice_create(request):
     """Create a new invoice"""
     if request.method == 'POST':
-        form = InvoiceForm(request.POST)
+        form = InvoiceForm(request.POST, request.FILES)
         if form.is_valid():
             invoice = form.save(commit=False)
             invoice.created_by = request.user
@@ -89,12 +109,61 @@ def invoice_create(request):
     return render(request, 'invoices/invoice_form.html', {'form': form})
 
 @login_required
+@is_finance
+def client_invoice_upload(request):
+    """Upload and parse a client invoice PDF"""
+    if request.method == 'POST':
+        form = ExpenseUploadForm(request.POST, request.FILES) # Reusing the upload form
+        if form.is_valid():
+            pdf_file = request.FILES['pdf_file']
+            
+            # Simple PyPDF2 Parsing
+            text = ""
+            try:
+                pdf_reader = PyPDF2.PdfReader(pdf_file)
+                for page in pdf_reader.pages:
+                    text += page.extract_text() + "\n"
+            except Exception as e:
+                messages.error(request, f"Error parsing PDF: {str(e)}")
+                return redirect('invoices:upload')
+            
+            # Extract basic data (Regex or simple heuristics)
+            import re
+            amount = 0.00
+            amounts = re.findall(r'\b\d{1,3}(?:,\d{3})*\.\d{2}\b', text)
+            if amounts:
+                try:
+                    amount = max([float(a.replace(',', '')) for a in amounts])
+                except:
+                    pass
+            
+            # Create a draft invoice
+            invoice = Invoice.objects.create(
+                institute_name="Parsed Client (Please Edit)",
+                institute_address="Address unknown",
+                service_type='software',
+                service_description=f"Auto-extracted from PDF. Found text length: {len(text)}",
+                software_amount=amount,
+                due_date=timezone.now().date() + timezone.timedelta(days=30),
+                pdf_file=pdf_file,
+                created_by=request.user
+            )
+            
+            messages.success(request, 'PDF parsed successfully. Please review and fill in the missing details.')
+            return redirect('invoices:edit', pk=invoice.pk)
+    else:
+        form = ExpenseUploadForm()
+        
+    return render(request, 'invoices/client_invoice_upload.html', {'form': form})
+
+@login_required
+@is_finance
 def invoice_edit(request, pk):
     """Edit an existing invoice"""
     invoice = get_object_or_404(Invoice, pk=pk, created_by=request.user)
     
     if request.method == 'POST':
-        form = InvoiceForm(request.POST, instance=invoice)
+        form = InvoiceForm(request.POST, request.FILES, instance=invoice)
         if form.is_valid():
             form.save()
             messages.success(request, f'Invoice {invoice.invoice_number} updated successfully!')
@@ -105,12 +174,14 @@ def invoice_edit(request, pk):
     return render(request, 'invoices/invoice_form.html', {'form': form})
 
 @login_required
+@is_finance
 def invoice_detail(request, pk):
     """Display invoice details"""
     invoice = get_object_or_404(Invoice, pk=pk, created_by=request.user)
     return render(request, 'invoices/invoice_detail.html', {'invoice': invoice})
 
 @login_required
+@is_finance
 def invoice_delete(request, pk):
     """Delete an invoice"""
     invoice = get_object_or_404(Invoice, pk=pk, created_by=request.user)
@@ -124,6 +195,7 @@ def invoice_delete(request, pk):
     return render(request, 'invoices/invoice_confirm_delete.html', {'invoice': invoice})
 
 @login_required
+@is_finance
 def mark_invoice_paid(request, pk):
     """Mark an invoice as paid"""
     invoice = get_object_or_404(Invoice, pk=pk, created_by=request.user)
@@ -141,6 +213,7 @@ def mark_invoice_paid(request, pk):
     return redirect('invoices:detail', pk=pk)
 
 @login_required
+@is_finance
 def invoice_pdf(request, pk):
     """Generate PDF for an invoice"""
     invoice = get_object_or_404(Invoice, pk=pk, created_by=request.user)
@@ -428,3 +501,90 @@ def invoice_pdf(request, pk):
     response.write(pdf)
     
     return response
+
+from django.db.models.functions import TruncMonth
+
+@login_required
+@is_finance
+def expense_upload(request):
+    """Upload and parse an invoice PDF to create an Expense"""
+    if request.method == 'POST':
+        form = ExpenseUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            pdf_file = request.FILES['pdf_file']
+            
+            # Simple PyPDF2 Parsing
+            text = ""
+            try:
+                pdf_reader = PyPDF2.PdfReader(pdf_file)
+                for page in pdf_reader.pages:
+                    text += page.extract_text() + "\n"
+            except Exception as e:
+                messages.error(request, f"Error parsing PDF: {str(e)}")
+                return redirect('invoices:expense_upload')
+            
+            # Extract basic data (Regex or simple heuristics)
+            import re
+            
+            amount = 0.00
+            # Look for money amounts (e.g. 10.50, 1,000.00, etc)
+            amounts = re.findall(r'\b\d{1,3}(?:,\d{3})*\.\d{2}\b', text)
+            if amounts:
+                # Use the max amount found as a heuristic for total
+                try:
+                    amount = max([float(a.replace(',', '')) for a in amounts])
+                except:
+                    pass
+            
+            date = timezone.now().date()
+            
+            # Create a draft expense
+            expense = Expense.objects.create(
+                vendor_name="Parsed Vendor (Please Edit)",
+                date=date,
+                amount=amount,
+                description=f"Auto-extracted from PDF. Found text length: {len(text)}",
+                pdf_file=pdf_file,
+                created_by=request.user
+            )
+            
+            messages.success(request, 'PDF parsed successfully. Please review and correct the extracted details.')
+            return redirect('invoices:expense_edit', pk=expense.pk)
+    else:
+        form = ExpenseUploadForm()
+        
+    return render(request, 'invoices/expense_upload.html', {'form': form})
+
+@login_required
+@is_finance
+def expense_list(request):
+    """View to list all uploaded expenses/vendor invoices"""
+    expenses = Expense.objects.filter(created_by=request.user).order_by('-date')
+    return render(request, 'invoices/expense_list.html', {'expenses': expenses})
+
+@login_required
+@is_finance
+def expense_edit(request, pk):
+    expense = get_object_or_404(Expense, pk=pk, created_by=request.user)
+    if request.method == 'POST':
+        form = ExpenseForm(request.POST, request.FILES, instance=expense)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Expense updated successfully!')
+            return redirect('home')
+    else:
+        form = ExpenseForm(instance=expense)
+        
+    return render(request, 'invoices/expense_form.html', {'form': form, 'expense': expense})
+
+@login_required
+@is_finance
+def expense_delete(request, pk):
+    """Delete a vendor invoice (expense)"""
+    expense = get_object_or_404(Expense, pk=pk, created_by=request.user)
+    if request.method == 'POST':
+        vendor_name = expense.vendor_name
+        expense.delete()
+        messages.success(request, f'Vendor Invoice for {vendor_name} deleted successfully!')
+        return redirect('invoices:expense_list')
+    return render(request, 'invoices/expense_confirm_delete.html', {'expense': expense})

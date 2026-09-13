@@ -53,8 +53,17 @@
                     <a href="{% url 'invoices:edit' invoice.pk %}" class="btn btn-outline-primary">
                         <i class="fas fa-edit"></i> Edit
                     </a>
-                    <a href="{% url 'invoices:pdf' invoice.pk %}" class="btn btn-danger" target="_blank">
-                        <i class="fas fa-file-pdf"></i> Download PDF
+                    {% if invoice.pdf_file %}
+                        <a href="{{ invoice.pdf_file.url }}" class="btn btn-danger" download>
+                            <i class="fas fa-file-pdf"></i> Download Uploaded PDF
+                        </a>
+                    {% else %}
+                        <a href="{% url 'invoices:pdf' invoice.pk %}" class="btn btn-danger" target="_blank">
+                            <i class="fas fa-file-pdf"></i> Download Generated PDF
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'invoices:delete' invoice.pk %}" class="btn btn-dark">
+                        <i class="fas fa-trash-alt"></i> Delete
                     </a>
                     <button onclick="window.print()" class="btn btn-info">
                         <i class="fas fa-print"></i> Print

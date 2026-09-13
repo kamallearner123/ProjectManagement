@@ -75,6 +75,9 @@ class Invoice(models.Model):
     is_paid = models.BooleanField(default=False)
     payment_date = models.DateField(blank=True, null=True)
     
+    # Uploaded File (optional replacement for generated PDF)
+    pdf_file = models.FileField(upload_to='client_invoices/pdfs/', blank=True, null=True)
+    
     class Meta:
         ordering = ['-created_at']
         
@@ -106,3 +109,20 @@ class Invoice(models.Model):
         elif self.service_type == 'software' and self.software_amount:
             return self.software_amount
         return Decimal('0.00')
+
+class Expense(models.Model):
+    vendor_name = models.CharField(max_length=200)
+    date = models.DateField()
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    category = models.CharField(max_length=100, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    pdf_file = models.FileField(upload_to='expenses/pdfs/', blank=True, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-date']
+
+    def __str__(self):
+        return f"{self.vendor_name} - {self.amount}"
+

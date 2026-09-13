@@ -1,18 +1,37 @@
 from django.contrib.auth.decorators import login_required
+from accounts.decorators import is_lms
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import Mentor, Student, LmsTask
 from .forms import MentorForm, StudentForm, LmsTaskForm
 
+@login_required
+@is_lms
+def lms_dashboard(request):
+    total_mentors = Mentor.objects.count()
+    total_students = Student.objects.count()
+    total_tasks = LmsTask.objects.count()
+    
+    context = {
+        'total_mentors': total_mentors,
+        'total_students': total_students,
+        'total_tasks': total_tasks,
+        'recent_students': Student.objects.order_by('-id')[:5],
+        'recent_tasks': LmsTask.objects.order_by('-created_at')[:5]
+    }
+    return render(request, 'lms/lms_dashboard.html', context)
+
 
 # Mentors
 @login_required
+@is_lms
 def mentor_list(request):
     mentors = Mentor.objects.all().order_by('full_name')
     return render(request, 'lms/mentor_list.html', {'mentors': mentors})
 
 
 @login_required
+@is_lms
 def mentor_create(request):
     if request.method == 'POST':
         form = MentorForm(request.POST)
@@ -28,6 +47,7 @@ def mentor_create(request):
 
 
 @login_required
+@is_lms
 def mentor_edit(request, pk):
     mentor = get_object_or_404(Mentor, pk=pk)
     if request.method == 'POST':
@@ -43,12 +63,14 @@ def mentor_edit(request, pk):
 
 # Students
 @login_required
+@is_lms
 def student_list(request):
     students = Student.objects.select_related('mentor').all().order_by('full_name')
     return render(request, 'lms/student_list.html', {'students': students})
 
 
 @login_required
+@is_lms
 def student_create(request):
     # Prefill mentor if provided via query param (?mentor=<id>)
     mentor_id = request.GET.get('mentor') or request.GET.get('mentor_id')
@@ -71,6 +93,7 @@ def student_create(request):
 
 
 @login_required
+@is_lms
 def student_edit(request, pk):
     student = get_object_or_404(Student, pk=pk)
     if request.method == 'POST':
@@ -86,12 +109,14 @@ def student_edit(request, pk):
 
 # LMS Tasks
 @login_required
+@is_lms
 def lms_task_list(request):
     tasks = LmsTask.objects.select_related('mentor').prefetch_related('students').all().order_by('-created_at')
     return render(request, 'lms/task_list.html', {'tasks': tasks})
 
 
 @login_required
+@is_lms
 def lms_task_create(request):
     if request.method == 'POST':
         form = LmsTaskForm(request.POST)
@@ -105,6 +130,7 @@ def lms_task_create(request):
 
 
 @login_required
+@is_lms
 def lms_task_edit(request, pk):
     task = get_object_or_404(LmsTask, pk=pk)
     if request.method == 'POST':

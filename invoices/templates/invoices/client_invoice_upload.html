@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Client Invoice PDF{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-file-pdf"></i> Upload Client Invoice PDF</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4">
+                        Upload an external Client Invoice PDF. The system will attempt to extract the total amount automatically. You can then fill in the rest of the details (Client, Service, Date, etc.) on the next screen.
+                    </p>
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.pdf_file.id_for_label }}" class="form-label fw-bold">Select PDF File</label>
+                            {{ form.pdf_file }}
+                            {% if form.pdf_file.errors %}
+                            <div class="text-danger mt-1 small">
+                                {{ form.pdf_file.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'invoices:list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload"></i> Upload & Parse
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

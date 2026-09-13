@@ -4,6 +4,7 @@ from . import views
 app_name = 'lms'
 
 urlpatterns = [
+    path('dashboard/', views.lms_dashboard, name='lms_dashboard'),
     # Mentor
     path('mentors/', views.mentor_list, name='mentor_list'),
     path('mentors/create/', views.mentor_create, name='mentor_create'),

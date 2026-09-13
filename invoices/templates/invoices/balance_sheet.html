@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Balance Sheet - Financials{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Balance Sheet</h1>
+            <div>
+                <a href="{% url 'invoices:expense_upload' %}" class="btn btn-warning"><i class="fas fa-file-invoice"></i> Upload Vendor Invoice (Expense)</a>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card bg-success text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Income</h5>
+                        <h2>₹{{ total_income|floatformat:2 }}</h2>
+                        <small>From paid invoices</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-danger text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Expenses</h5>
+                        <h2>₹{{ total_expense|floatformat:2 }}</h2>
+                        <small>From uploaded vendor invoices</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-primary text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Net Profit</h5>
+                        <h2>₹{{ net_profit|floatformat:2 }}</h2>
+                        <small>Income - Expenses</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">Recent Income (Paid Invoices)</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Client</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for inv in invoices %}
+                                <tr>
+                                    <td><a href="{% url 'invoices:detail' inv.pk %}">{{ inv.invoice_number }}</a></td>
+                                    <td>{{ inv.institute_name }}</td>
+                                    <td class="text-success">+₹{{ inv.total_amount|floatformat:2 }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="3" class="text-center">No paid invoices found.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">Recent Expenses</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Vendor</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for exp in expenses %}
+                                <tr>
+                                    <td>{{ exp.vendor_name }}</td>
+                                    <td>{{ exp.date }}</td>
+                                    <td class="text-danger">-₹{{ exp.amount|floatformat:2 }}</td>
+                                    <td>
+                                        <a href="{% url 'invoices:expense_edit' exp.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center">No expenses found.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
